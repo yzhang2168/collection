@@ -5,7 +5,7 @@ import java.util.Set;
 public class HashMapLinearProbing<K, V> {
 
     private static final int INIT_CAPACITY = 4;
-    private static final int MAX_CAPACITY = 1 << 30; // 2 ^ 30
+    private static final int MAX_CAPACITY = 1 << 30; // 2^30, left shifting => *= 2. 1<<0 = 2^0, 1<<1 = 2^1, 1<<2 = 2^2 
     private static final int SCALE_FACTOR = 2;
     private static final float DEFAULT_LOAD_FACTOR = 0.75f;
     private float loadFactor;
@@ -25,6 +25,7 @@ public class HashMapLinearProbing<K, V> {
         capacity = capacity > MAX_CAPACITY ? MAX_CAPACITY : trimToPowerOf2(capacity);
         this.loadFactor = loadFactor;
 
+        // init the table - need size() for getIndex()
         table = (ArrayList<Entry<K, V>>) new ArrayList();
         for (int i = 0; i < capacity; i++) {
             table.add(null);
@@ -38,7 +39,7 @@ public class HashMapLinearProbing<K, V> {
         size = 0;
     }
 
-    /* not dealing with deleted entry situation */
+    /* not dealing with deleted entry scenario */
     public V put(K key, V value) {
         int index = getIndex(key);
         Entry<K, V> entry = table.get(index);
@@ -75,7 +76,8 @@ public class HashMapLinearProbing<K, V> {
         ArrayList<Entry<K, V>> old = table;
         table = (ArrayList<Entry<K, V>>) new ArrayList();
         size = 0;
-        for (int i = 0; i < old.size() * SCALE_FACTOR; i++) {
+        int capacity = old.size() * SCALE_FACTOR;
+        for (int i = 0; i < capacity; i++) {
             table.add(null);
         }
         
@@ -87,11 +89,13 @@ public class HashMapLinearProbing<K, V> {
         }
     }
     
+    /** change capacity to min power of 2 > capacity such that i % N => i & (N - 1), much faster */
     private int trimToPowerOf2(int initCapacity) {
         int capacity = 1;
         while (capacity < initCapacity) {
             capacity <<= 1;
         }
+        // smallest power of 2 >= initCapacity
         return capacity;
     }
     
@@ -108,7 +112,7 @@ public class HashMapLinearProbing<K, V> {
     }
 
     /** 
-     * ==== allows duplicate keys ====
+     * ====== allows duplicate keys ======
      *  public V put(K key, V value) {
             int index = getIndex(key);
             Entry<K, V> entry = table.get(index);
@@ -136,16 +140,20 @@ public class HashMapLinearProbing<K, V> {
                     result.add(table.get(index).getValue());
                 }
             }
+            
             return result;
         }    
-         * */
+    * */
     
     private int getIndex(K key) {
         if (key == null) {
             return 0;
         }
-        int hash = key.hashCode() & (table.size() - 1); // % table.size()
-        return hash & 0x7fffffff; // non-negative
+        
+        // post processing: hashValue -> non-negative number
+        int hash = key.hashCode() & 0x7fffffff; 
+        // same as % table.size() when N is a power of 2 
+        return hash & (table.size() - 1);
     }
 
     public void remove(K key) {
@@ -218,13 +226,14 @@ public class HashMapLinearProbing<K, V> {
         StringBuilder sb = new StringBuilder("[");
         for (int i = 0; i < table.size(); i++) {
             if (table.get(i) != null) {
-                sb.append(table.get(i));
-                    sb.append(", ");
+                sb.append(table.get(i)).append(", ");
             }
         }
+        
         if (sb.length() > 1) {
             sb.delete(sb.length() - 2, sb.length());
         }
+        
         sb.append(']');
         return sb.toString();
     }
@@ -281,6 +290,7 @@ public class HashMapLinearProbing<K, V> {
     }
     
     public static void main(String[] args) {
+        
         HashMapLinearProbing<String, Integer> map = new HashMapLinearProbing<>();
         System.out.println(map);
         System.out.println("size = " + map.size());

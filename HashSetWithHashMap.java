@@ -87,6 +87,12 @@ public class HashSetWithHashMap<E> implements Iterable<E> {
         public E next() {
             return list.get(curr++);
         }
+        
+        @Override
+        public void remove() {
+            map.remove(list.get(curr));
+            list.remove(curr);
+        }
     }
     
     public static void main(String[] args) {
@@ -105,10 +111,13 @@ public class HashSetWithHashMap<E> implements Iterable<E> {
         System.out.println("Remove Smith in set " + set.remove("Smith"));
         System.out.println("Names in set in uppercase are ");
         
-        for (String s: set) {
-            System.out.print(s.toUpperCase() + " ");
+        Iterator<String> it = set.iterator();
+        while (it.hasNext()) {
+            it.remove();
         }
-                    
+        
+        System.out.println("Elements in set: " + set);
+        
         set.clear();
         System.out.println("\nElements in set: " + set);
     }

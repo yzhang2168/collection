@@ -28,6 +28,7 @@ public class HashSetImpl<E> implements Iterable<E> {
         size = 0;
     }
     
+    /** change capacity to min power of 2 > capacity such that i % N => i & (N - 1), much faster */
     private int trimToPowerOf2(int capacity) {
         int cap = 1;
         while (cap < capacity) {
@@ -54,17 +55,14 @@ public class HashSetImpl<E> implements Iterable<E> {
         return false;
     }
     
-    private int getIndex(E e) {
-        return hash(e) % table.length;
-    }
-    
-    private int hash(E e) {
+    private int getIndex(E e) {       
         if (e == null) {
             return 0;
         }
         
-        int hashValue = e.hashCode();
-        return hashValue & 0x7fffffff;
+        // post processing: hashValue -> non-negative number
+        int hashValue = e.hashCode() & 0x7fffffff;
+        return hashValue & (table.length - 1);        
     }
     
     public boolean add(E e) {
@@ -143,6 +141,7 @@ public class HashSetImpl<E> implements Iterable<E> {
                 }
             }
         }
+        
         sb.append(']');
         return sb.toString();
     }
@@ -187,12 +186,4 @@ public class HashSetImpl<E> implements Iterable<E> {
         }
     }
     
-    public static void main(String[] args) {
-        ArrayList<Integer> list = null;
-        for (Integer i : list) { // NPE
-            System.out.println(i);
-        }
-        
-        System.out.println("done");
-    }
 }
