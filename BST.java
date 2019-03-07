@@ -3,6 +3,7 @@ import java.util.ArrayList;
 import java.util.Deque;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Queue;
 
 class TreeNode<E extends Comparable<E>> {
     protected E e;
@@ -146,7 +147,7 @@ public class BST<E extends Comparable<E>> implements Iterable<E> {
                 parentOfRightmost.left = rightmost.left;
             }
         }
-        
+
         size--;
         return true;
     }
@@ -187,7 +188,7 @@ public class BST<E extends Comparable<E>> implements Iterable<E> {
         }
     }
 
-    public java.util.List<E> preorder() {
+    public List<E> preorder() {
         List<E> result = new ArrayList<E>();
         preorderRecursion(root, result);
         return result;
@@ -202,7 +203,7 @@ public class BST<E extends Comparable<E>> implements Iterable<E> {
         preorderRecursion(curr.right, result);
     }
 
-    public java.util.List<E> postorder() {
+    public List<E> postorder() {
         List<E> result = new ArrayList<E>();
         postorderRecursion(root, result);
         return result;
@@ -217,7 +218,35 @@ public class BST<E extends Comparable<E>> implements Iterable<E> {
         result.add(curr.e);
     }
 
-    public java.util.List<E> pathFromRoot(E e) {
+    public List<List<E>> BFS() {
+        List<List<E>> result = new ArrayList<List<E>>();
+
+        Queue<TreeNode<E>> queue = new ArrayDeque<TreeNode<E>>();
+        if (root == null) {
+            return result;
+        }
+
+        queue.offer(root);
+        while (!queue.isEmpty()) {
+            int size = queue.size();
+            List<E> level = new ArrayList<E>();
+            for (int i = 0; i < size; i++) {
+                TreeNode<E> curr = queue.poll();
+                level.add(curr.e);
+                if (curr.left != null) {
+                    queue.offer(curr.left);
+                }
+                if (curr.right != null) {
+                    queue.offer(curr.right);
+                }
+            }
+            result.add(new ArrayList<E>(level));
+        }
+
+        return result;
+    }
+
+    public List<E> pathFromRoot(E e) {
         List<E> result = new ArrayList<E>();
         TreeNode<E> curr = root;
 
@@ -239,6 +268,49 @@ public class BST<E extends Comparable<E>> implements Iterable<E> {
         }
     }
 
+    public int height() {
+        return getHeight(root);
+    }
+
+    private int getHeight(TreeNode<E> root) {
+        if (root == null) {
+            return 0;
+        }
+
+        return Math.max(getHeight(root.left), getHeight(root.right)) + 1;
+    }
+
+    public boolean isCompleteBST() {
+        return size == Math.pow(2, height()) - 1;
+    }
+
+    public int getNumberOfLeaves() {
+        int leaves = 0;
+        Deque<TreeNode<E>> stack = new ArrayDeque<TreeNode<E>>();
+
+        pushLeft(root, stack);
+        while (!stack.isEmpty()) {
+            TreeNode<E> curr = stack.pop();
+            if (curr.left == null && curr.right == null) {
+                leaves++;
+            }
+            curr = curr.right;
+            pushLeft(curr, stack);
+        }
+        return leaves;
+    }
+
+    public int getNumberOfLeaves(TreeNode<E> node) {
+        if (node == null) {
+            return 0;
+        }
+        if (node.left == null && node.right == null) {
+            return 1;
+        } else {
+            return getNumberOfLeaves(node.left) + getNumberOfLeaves(node.right);
+        }
+    }
+
     public int size() {
         return size;
     }
@@ -250,6 +322,52 @@ public class BST<E extends Comparable<E>> implements Iterable<E> {
     public void clear() {
         root = null;
         size = 0;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+
+        if (!(o instanceof BST)) {
+            return false;
+        }
+
+        BST<E> other = (BST<E>) o;
+        if (this.size != other.size) {
+            return false;
+        }
+
+        return equals(this.root, other.root);
+    }
+
+    private boolean equals(TreeNode<E> one, TreeNode<E> two) {
+        if (one == two) {
+            return true;
+        } else if (one == null || two == null) {
+            return false;
+        } else {
+            return one.e.equals(two.e) && equals(one.left, two.left) && equals(one.right, two.right);
+        }
+    }
+
+    @Override
+    public BST<E> clone() throws CloneNotSupportedException {
+        BST<E> clone = new BST<E>();
+        clone(clone, root);
+        return clone;
+    }
+
+    // deep copy
+    private void clone(BST<E> clone, TreeNode<E> root) {
+        if (root == null) {
+            return;
+        }
+        
+        clone.insert(root.e);
+        clone(clone, root.left);
+        clone(clone, root.right);
     }
     
     @Override
@@ -288,6 +406,34 @@ public class BST<E extends Comparable<E>> implements Iterable<E> {
             // throw new UnsupportedOperationException ("Removing an element
             // from the iterator is not supported");
         }
+        
+        public Iterator<E> preorderIterator() {
+            return new PreorderIterator();
+        }
+        
+        private class PreorderIterator implements Iterator<E> {
+            
+            private List<E> list;
+            private int curr;
+            
+            public PreorderIterator() {
+                list = preorder();
+                curr = 0;
+            }
+            
+            public boolean hasNext() {
+                return curr < list.size();
+            }
+            
+            public E next() {
+                return list.get(curr++);
+            }
+            
+            public void remove() {
+                delete(list.get(curr));
+                list = preorder();
+            }
+        }
     }
 
     public static void main(String[] args) {
@@ -300,19 +446,36 @@ public class BST<E extends Comparable<E>> implements Iterable<E> {
         test.insert(0);
         test.insert(7);
         test.insert(2);
-        System.out.println("size     : " + test.size());
+        System.out.println("\nsize     : " + test.size());
         System.out.println("inorder  : " + test.inorder());
         System.out.println("preorder : " + test.preorder());
         System.out.println("postorder: " + test.postorder());
+        System.out.println("BFS      : " + test.BFS());
         System.out.println("toString():" + test);
-        
+        System.out.println("height   : " + test.height());
+        System.out.println("complete : " + test.isCompleteBST());
+        System.out.println("leaves   : " + test.getNumberOfLeaves());
+        System.out.println("leaves   : " + test.getNumberOfLeaves(test.getRoot()));
         System.out.println("path to 2: " + test.pathFromRoot(2));
         System.out.println("path to 7: " + test.pathFromRoot(7));
         System.out.println("path to 10:" + test.pathFromRoot(10));
-        
+
         test.delete(5);
-        System.out.println("deleted 5: " + test);
-        
+        System.out.println("\ndeleted 5: " + test);
+        System.out.println("BFS      : " + test.BFS());
+        System.out.println("height   : " + test.height());
+        System.out.println("complete : " + test.isCompleteBST());
+        System.out.println("leaves   : " + test.getNumberOfLeaves());
+        System.out.println("leaves   : " + test.getNumberOfLeaves(test.getRoot()));
+
+        test.delete(7);
+        System.out.println("\ndeleted 7: " + test);
+        System.out.println("BFS      : " + test.BFS());
+        System.out.println("height   : " + test.height());
+        System.out.println("complete : " + test.isCompleteBST());
+        System.out.println("leaves   : " + test.getNumberOfLeaves());
+        System.out.println("leaves   : " + test.getNumberOfLeaves(test.getRoot()));
+
         System.out.print("iterator: ");
         for (Integer i : test) {
             System.out.print(i + " ");
