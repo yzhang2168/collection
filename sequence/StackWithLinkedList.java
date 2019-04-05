@@ -3,7 +3,7 @@ package sequence;
 /**
  * implements stack using a linked list
  */
-public class Stack<E> {
+public class StackWithLinkedList<E> {
 
 	private class Node {
 		private E value;
@@ -18,7 +18,7 @@ public class Stack<E> {
 	private Node head;
 	private int size;
 
-	public Stack() {
+	public StackWithLinkedList() {
 		head = null;
 		size = 0;
 	}
@@ -81,7 +81,7 @@ public class Stack<E> {
 	}
 
 	public static void main(String[] args) {
-		Stack<Integer> s = new Stack<>();
+		StackWithLinkedList<Integer> s = new StackWithLinkedList<>();
 		System.out.println("\npeek(): " + s.peek());
 		System.out.println(s);
 

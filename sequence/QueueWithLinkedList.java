@@ -3,7 +3,7 @@ package sequence;
 /**
  * implements queue using a linked list
  */
-public class Queue<E> {
+public class QueueWithLinkedList<E> {
 
 	private class Node {
 		private E value;
@@ -19,7 +19,7 @@ public class Queue<E> {
 	private Node tail;
 	private int size;
 
-	public Queue() {
+	public QueueWithLinkedList() {
 		head = null;
 		tail = null;
 		size = 0;
@@ -88,7 +88,7 @@ public class Queue<E> {
 	}
 
 	public static void main(String[] args) {
-		Queue<Integer> q = new Queue<>();
+		QueueWithLinkedList<Integer> q = new QueueWithLinkedList<>();
 		System.out.println("\npeek(): " + q.peek());
 		System.out.println(q);
 
