@@ -18,7 +18,7 @@ public class LinkedList<E> {
 	}
 
 	private Node head;
-	int size;
+	private int size;
 
 	public LinkedList() {
 		head = null;
@@ -33,27 +33,30 @@ public class LinkedList<E> {
 		return size == 0;
 	}
 
-	public E getHead() {
+	public E get(int index) {
 		if (head == null) {
-			System.err.println("Warning: The list is empty!");
 			return null;
-		} else {
-			return head.value;
 		}
+
+		if (index < 0 || index >= size) {
+			throw new IndexOutOfBoundsException("invalid index");
+		}
+
+		Node curr = head;
+		while (index > 0 && curr != null) {
+			curr = curr.next;
+			index--;
+		}
+		// index == 0
+		return curr.value;
+	}
+
+	public E getHead() {
+		return get(0);
 	}
 
 	public E getTail() {
-		Node curr = head;
-		while (curr != null && curr.next != null) {
-			curr = curr.next;
-		}
-
-		if (curr == null) {
-			System.err.println("Warning: The list is empty!");
-			return null;
-		} else {
-			return curr.value;
-		}
+		return get(size - 1);
 	}
 
 	/**
@@ -75,7 +78,8 @@ public class LinkedList<E> {
 			while (prev != null && index > 1) {
 				prev = prev.next;
 				index--;
-			}			
+			}
+			// index == 1
 			newNode.next = prev.next;
 			prev.next = newNode;
 		}
@@ -91,55 +95,58 @@ public class LinkedList<E> {
 		return add(0, value);
 	}
 
-	/* pass by value, head is a copy */
-	public Node addHead(Node head, E value) {
-		Node newHead = new Node(value);
-		newHead.next = head;
-		head = newHead;
-		size++;
-		return head;
+	public void addTail(E value) {
+		add(value);
 	}
+	
+	public E remove(int index) {
+		if (index < 0 || index >= size) {
+			throw new IndexOutOfBoundsException("Invalid index");
+		}
 
-	public Node addTail(E value) {
-		return add(value);
+		if (head == null) {
+			return null;
+		}
+		
+		if (index == 0) {
+			E result = head.value;
+			head = head.next;
+			size--;
+			return result;
+		}
+		
+		// not head
+		Node prev = head;
+		while (prev != null && prev.next != null && index > 1) {
+			prev = prev.next;
+			index--;
+		}		
+		// index == 1, prev.next is target
+		E result = prev.next.value;
+		prev.next = prev.next.next;
+		size--;
+		return result;
 	}
-
+	
 	/* return first occurrence */
 	public Node remove(E value) {
 		if (head == null) {
 			return null;
-		} else if (head.value == value) {
+		} else if (head.value.equals(value)) {
 			head = head.next;
+			size--;
 			return head;
 		} else {
-			Node curr = head;
-			while (curr != null && curr.next != null && curr.next.value != value) {
-				curr = curr.next;
+			Node prev = head;
+			while (prev != null && prev.next != null && !prev.next.value.equals(value)) {
+				prev = prev.next;
 			}
-			// curr.next == null || curr.next.value == value
-			if (curr.next != null) {
-				curr.next = curr.next.next;
+			// prev.next == null || prev.next.value.equals(value)
+			if (prev.next != null) {
+				prev.next = prev.next.next;
+				size--;
 			}
 			return head;
-		}
-	}
-
-	public E get(int index) {
-		if (index < 0 || index >= size) {
-			throw new IndexOutOfBoundsException("invalid index");
-		}
-
-		Node curr = head;
-		while (index > 0 && curr != null) {
-			curr = curr.next;
-			index--;
-		}
-
-		// index == 0 || curr == null
-		if (curr == null) {
-			return null;
-		} else {
-			return curr.value;
 		}
 	}
 
