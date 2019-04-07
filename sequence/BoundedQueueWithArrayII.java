@@ -19,7 +19,7 @@ public class BoundedQueueWithArrayII<E> {
 	}
 	
 	public boolean isEmpty() {
-		int start = head + 1 == array.length ? 0 : head + 1;
+		int start = head == array.length - 1 ? 0 : head + 1;
 		return start == tail;
 	}
 	
@@ -32,7 +32,7 @@ public class BoundedQueueWithArrayII<E> {
 			return false;
 		} else {
 			array[tail] = value;
-			tail = (tail + 1 == array.length) ? 0 : tail + 1;
+			tail = tail == array.length - 1 ? 0 : tail + 1;
 			return true;
 		}
 	}
@@ -41,9 +41,8 @@ public class BoundedQueueWithArrayII<E> {
 		if (isEmpty()) {
 			return null;
 		} else {
-			int curr = (head + 1 == array.length) ? 0 : head + 1;
-			head = head + 1 == array.length ? 0 : head + 1;
-			return array[curr];
+			head = head == array.length - 1 ? 0 : head + 1;
+			return array[head];
 		}
 	}
 	
@@ -51,8 +50,8 @@ public class BoundedQueueWithArrayII<E> {
 		if (isEmpty()) {
 			return null;
 		} else {
-			int curr = (head + 1 == array.length) ? 0: head + 1;
-			return array[curr];
+			int start = head == array.length - 1 ? 0: head + 1;
+			return array[start];
 		}
 	}
 	

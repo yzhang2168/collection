@@ -24,8 +24,8 @@ public class BoundedQueueWithArrayI<E> {
 			return false;
 		} else {
 			array[tail] = value;
-			size++;
 			tail = tail + 1 == array.length ? 0 : tail + 1;
+			size++;
 			return true;
 		}
 	}
@@ -67,7 +67,7 @@ public class BoundedQueueWithArrayI<E> {
 			for (int i = head; i < tail; i++) {
 				sb.append(array[i]).append(',');
 			}
-		} else if (size > 0) {
+		} else if (!isEmpty()) {
 		// head > tail
 	    // head == tail: is empty or full
 			for (int i = head; i < array.length; i++) {
@@ -78,9 +78,6 @@ public class BoundedQueueWithArrayI<E> {
 			}
 		}
 		
-		if (sb.length() > 1) {
-			sb.deleteCharAt(sb.length() - 1);
-		}
 		sb.append(']');
 		return sb.toString();		
 	}
