@@ -49,7 +49,7 @@ public class StackWithLinkedList<E> {
 		}
 	}
 
-	public E peek() {
+	public E top() {
 		if (head == null) {
 			return null;
 		} else {
@@ -70,7 +70,7 @@ public class StackWithLinkedList<E> {
 		StringBuilder sb = new StringBuilder("[");
 		Node curr = head;
 		while (curr != null) {
-			sb.append(curr.value).append(',');
+			sb.append(curr.value.toString()).append(',');
 			curr = curr.next;
 		}
 		if (sb.length() > 1) {
@@ -82,39 +82,39 @@ public class StackWithLinkedList<E> {
 
 	public static void main(String[] args) {
 		StackWithLinkedList<Integer> s = new StackWithLinkedList<>();
-		System.out.println("\npeek(): " + s.peek());
+		System.out.println("\ntop(): " + s.top());
 		System.out.println(s);
 
 		s.push(1);
-		System.out.println("\npeek(): " + s.peek());
+		System.out.println("\ntop(): " + s.top());
 		System.out.println(s);
 
 		s.push(2);
-		System.out.println("\npeek(): " + s.peek());
+		System.out.println("\ntop(): " + s.top());
 		System.out.println(s);
 
 		s.push(3);
-		System.out.println("\npeek(): " + s.peek());
+		System.out.println("\ntop(): " + s.top());
 		System.out.println(s);
 
 		System.out.print("\npop(): ");
 		System.out.println(s.pop());
-		System.out.println("peek(): " + s.peek());
+		System.out.println("top(): " + s.top());
 		System.out.println(s);
 
 		System.out.print("\npop(): ");
 		System.out.println(s.pop());
-		System.out.println("peek(): " + s.peek());
+		System.out.println("top(): " + s.top());
 		System.out.println(s);
 
 		System.out.print("\npop(): ");
 		System.out.println(s.pop());
-		System.out.println("peek(): " + s.peek());
+		System.out.println("top(): " + s.top());
 		System.out.println(s);
 
 		System.out.print("\npop(): ");
 		System.out.println(s.pop());
-		System.out.println("peek(): " + s.peek());
+		System.out.println("top(): " + s.top());
 		System.out.println(s);
 	}
 }

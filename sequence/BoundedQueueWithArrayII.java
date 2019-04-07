@@ -13,6 +13,9 @@ public class BoundedQueueWithArrayII<E> {
 	private int tail;
 	
 	public BoundedQueueWithArrayII(int cap) {
+		if (cap <= 0) {
+			throw new IllegalArgumentException("Invalid capacity");
+		}
 		array = (E[]) new Object[cap];
 		head = 0;
 		tail = 1;

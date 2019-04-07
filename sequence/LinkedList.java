@@ -1,6 +1,8 @@
 package sequence;
 
-public class LinkedList<E> {
+import java.util.Iterator;
+
+public class LinkedList<E> implements Iterable<E> {
 
 	private class Node {
 		private E value;
@@ -34,16 +36,16 @@ public class LinkedList<E> {
 	}
 
 	public E get(int index) {
-		if (head == null) {
+		if (isEmpty()) {
 			return null;
 		}
 
 		if (index < 0 || index >= size) {
-			throw new IndexOutOfBoundsException("invalid index");
+			throw new IndexOutOfBoundsException("Invalid index");
 		}
 
 		Node curr = head;
-		while (index > 0 && curr != null) {
+		while (curr != null && index > 0) {
 			curr = curr.next;
 			index--;
 		}
@@ -51,11 +53,11 @@ public class LinkedList<E> {
 		return curr.value;
 	}
 
-	public E getHead() {
+	public E getFirst() {
 		return get(0);
 	}
 
-	public E getTail() {
+	public E getLast() {
 		return get(size - 1);
 	}
 
@@ -91,51 +93,58 @@ public class LinkedList<E> {
 		return add(size, value);
 	}
 
-	public Node addHead(E value) {
+	public Node addFirst(E value) {
 		return add(0, value);
 	}
 
-	public void addTail(E value) {
+	public void addLast(E value) {
 		add(value);
 	}
-	
+
+	public boolean contains(E value) {
+		if (isEmpty()) {
+			return false;
+		}
+
+		Node curr = head;
+		while (curr != null && !curr.value.equals(value)) {
+			curr = curr.next;
+		}
+		return curr == null ? false : true;
+	}
+
 	public E remove(int index) {
+		// covers isEmpty()
 		if (index < 0 || index >= size) {
 			throw new IndexOutOfBoundsException("Invalid index");
 		}
 
-		if (head == null) {
-			return null;
-		}
-		
+		E result = null;
 		if (index == 0) {
-			E result = head.value;
+			result = head.value;
 			head = head.next;
-			size--;
-			return result;
+		} else {
+			Node prev = head;
+			while (prev != null && prev.next != null && index > 1) {
+				prev = prev.next;
+				index--;
+			}
+			// index == 1, prev.next is target
+			result = prev.next.value;
+			prev.next = prev.next.next;
 		}
-		
-		// not head
-		Node prev = head;
-		while (prev != null && prev.next != null && index > 1) {
-			prev = prev.next;
-			index--;
-		}		
-		// index == 1, prev.next is target
-		E result = prev.next.value;
-		prev.next = prev.next.next;
 		size--;
 		return result;
 	}
-	
-	/* return first occurrence */
-	public Node remove(E value) {
-		if (head == null) {
-			return null;
+
+	/** removes first occurrence */
+	public boolean remove(E value) {
+		if (isEmpty()) {
+			return false;
 		} else if (head.value.equals(value)) {
 			head = head.next;
 			size--;
-			return head;
+			return true;
 		} else {
 			Node prev = head;
 			while (prev != null && prev.next != null && !prev.next.value.equals(value)) {
@@ -145,9 +154,30 @@ public class LinkedList<E> {
 			if (prev.next != null) {
 				prev.next = prev.next.next;
 				size--;
+				return true;
+			} else {
+				return false;
 			}
-			return head;
 		}
+	}
+
+	public void clear() {
+		head = null;
+		size = 0;
+	}
+
+	public E[] toArray() {
+		if (isEmpty()) {
+			return (E[]) new Object[0];
+		}
+
+		E[] result = (E[]) new Object[size];
+		Node curr = head;
+		for (int i = 0; i < size; i++) {
+			result[i] = curr.value;
+			curr = curr.next;
+		}
+		return result;
 	}
 
 	public String toString() {
@@ -165,13 +195,37 @@ public class LinkedList<E> {
 		return sb.toString();
 	}
 
+	@Override
+	public Iterator<E> iterator() {
+		return new MyIterator();
+	}
+
+	private class MyIterator implements Iterator<E> {
+		private int curr;
+
+		@Override
+		public boolean hasNext() {
+			return curr < size;
+		}
+
+		@Override
+		public E next() {
+			return get(curr++);
+		}
+
+		@Override
+		public void remove() {
+			LinkedList.this.remove(curr);
+		}
+	}
+
 	public static void main(String[] args) {
 		LinkedList<Integer> l = new LinkedList<>();
 		System.out.println(l);
-		
+
 		System.out.println("\nadd(0,1): " + l.add(0, 1));
 		System.out.println(l);
-		
+
 		System.out.println("\nadd(0,2): " + l.add(0, 2));
 		System.out.println(l);
 
@@ -180,11 +234,21 @@ public class LinkedList<E> {
 		System.out.println(l.get(0));
 		System.out.println(l.get(1));
 		System.out.println(l.get(2));
-		//System.out.println(l.get(-2));
+		// System.out.println(l.get(-2));
 
+		System.out.println("\nusing Iterator<E>");
+		for (Integer i : l) {
+			System.out.println(i);
+		}
+		
+		System.out.println("\nusing toArray()");
+		Integer[] array = l.toArray();		
+		for (Object i : array) {
+			System.out.println(i);
+		}
+		
 		System.out.print("\nremoving non-existing value: ");
-		System.out.println(l.remove(10));
-		System.out.println(l);
+		//System.out.println(l.remove(10));
 
 		System.out.print("\nremoving head: ");
 		System.out.println(l.remove(2));
@@ -195,12 +259,13 @@ public class LinkedList<E> {
 		System.out.println(l);
 
 		System.out.print("\nremoving head: ");
-		System.out.println(l.remove(3));
+		System.out.println(l.remove(new Integer(3)));
 		System.out.println(l);
 
 		System.out.print("\nremoving from a list with head == null: ");
-		System.out.println(l.remove(1));
+		//System.out.println(l.remove(1));
 		System.out.println(l);
 
 	}
+
 }

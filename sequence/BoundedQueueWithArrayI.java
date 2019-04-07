@@ -13,6 +13,9 @@ public class BoundedQueueWithArrayI<E> {
 	private int size;
 	
 	public BoundedQueueWithArrayI(int cap) {
+		if (cap <= 0) {
+			throw new IllegalArgumentException("Invalid capacity");
+		}
 		array = (E[]) new Object[cap];
 		head = 0;
 		tail = 0;
@@ -24,7 +27,7 @@ public class BoundedQueueWithArrayI<E> {
 			return false;
 		} else {
 			array[tail] = value;
-			tail = tail + 1 == array.length ? 0 : tail + 1;
+			tail = tail == array.length - 1 ? 0 : tail + 1;
 			size++;
 			return true;
 		}
@@ -43,7 +46,7 @@ public class BoundedQueueWithArrayI<E> {
 			return null;
 		} else {
 			E result = array[head];
-			head = head + 1 == array.length ? 0 : head + 1;
+			head = head == array.length - 1 ? 0 : head + 1;
 			size--;
 			return result;
 		}
@@ -71,10 +74,10 @@ public class BoundedQueueWithArrayI<E> {
 		// head > tail
 	    // head == tail: is empty or full
 			for (int i = head; i < array.length; i++) {
-				sb.append(array[i]).append(',');
+				sb.append(array[i].toString()).append(',');
 			}
 			for (int i = 0; i < tail; i++) {
-				sb.append(array[i]).append(',');
+				sb.append(array[i].toString()).append(',');
 			}
 		}
 		

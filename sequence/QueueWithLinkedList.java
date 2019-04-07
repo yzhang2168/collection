@@ -46,11 +46,9 @@ public class QueueWithLinkedList<E> {
 		} else {
 			E result = head.value;
 			if (head == tail) {
-				head = null;
 				tail = null;
-			} else {
-				head = head.next;
-			}
+			} 
+			head = head.next;
 			size--;
 			return result;
 		}
@@ -77,7 +75,7 @@ public class QueueWithLinkedList<E> {
 		StringBuilder sb = new StringBuilder("[");
 		Node curr = head;
 		while (curr != null) {
-			sb.append(curr.value).append(',');
+			sb.append(curr.value.toString()).append(',');
 			curr = curr.next;
 		}
 		if (sb.length() > 1) {

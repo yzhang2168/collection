@@ -16,7 +16,9 @@ public class ArrayListWithArray<E> implements Iterable<E> {
 	}
 	
 	public ArrayListWithArray(int capacity) {
-		capacity = capacity < INIT_CAPACITY ? INIT_CAPACITY : capacity;
+		if (capacity <= 0) {
+			throw new IllegalArgumentException("Invalid capacity");
+		}
 		array = (E[]) new Object[capacity];
 		size = 0;
 	}
@@ -117,6 +119,7 @@ public class ArrayListWithArray<E> implements Iterable<E> {
 	
 	public void clear() {
 		Arrays.fill(array, null);
+		size = 0;
 	}
 	
 	private void expand() {
