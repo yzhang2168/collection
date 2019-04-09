@@ -166,12 +166,12 @@ public class LinkedList<E> implements Iterable<E> {
 		size = 0;
 	}
 
-	public E[] toArray() {
+	public Object[] toArray() {
 		if (isEmpty()) {
-			return (E[]) new Object[0];
+			return new Object[0];
 		}
 
-		E[] result = (E[]) new Object[size];
+		Object[] result = new Object[size];
 		Node curr = head;
 		for (int i = 0; i < size; i++) {
 			result[i] = curr.value;
@@ -179,7 +179,7 @@ public class LinkedList<E> implements Iterable<E> {
 		}
 		return result;
 	}
-
+	
 	public String toString() {
 		StringBuilder sb = new StringBuilder("[");
 		Node curr = head;
@@ -242,7 +242,7 @@ public class LinkedList<E> implements Iterable<E> {
 		}
 		
 		System.out.println("\nusing toArray()");
-		Integer[] array = l.toArray();		
+		Object[] array = l.toArray();		
 		for (Object i : array) {
 			System.out.println(i);
 		}
