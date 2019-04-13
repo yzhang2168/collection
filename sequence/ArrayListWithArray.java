@@ -150,7 +150,7 @@ public class ArrayListWithArray<E> implements Iterable<E> {
 
 		@Override
 		public E next() {
-			return array[curr++];
+			return get(curr++);
 		}
 		
 		@Override

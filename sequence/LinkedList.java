@@ -110,7 +110,7 @@ public class LinkedList<E> implements Iterable<E> {
 		while (curr != null && !curr.value.equals(value)) {
 			curr = curr.next;
 		}
-		return curr == null ? false : true;
+		return curr != null;
 	}
 
 	public E remove(int index) {
@@ -167,10 +167,6 @@ public class LinkedList<E> implements Iterable<E> {
 	}
 
 	public Object[] toArray() {
-		if (isEmpty()) {
-			return new Object[0];
-		}
-
 		Object[] result = new Object[size];
 		Node curr = head;
 		for (int i = 0; i < size; i++) {
@@ -184,13 +180,13 @@ public class LinkedList<E> implements Iterable<E> {
 		StringBuilder sb = new StringBuilder("[");
 		Node curr = head;
 		while (curr != null) {
-			sb.append(curr.toString()).append(',');
-			curr = curr.next;
+			sb.append(curr.toString());
+			if (curr.next != null) {
+				sb.append(',');
+			}
+			curr = curr.next;			
 		}
 
-		if (sb.length() > 1) {
-			sb.deleteCharAt(sb.length() - 1);
-		}
 		sb.append(']');
 		return sb.toString();
 	}
@@ -219,10 +215,15 @@ public class LinkedList<E> implements Iterable<E> {
 		}
 	}
 
-	public static void main(String[] args) {
+	public static void main(String[] args) {		
 		LinkedList<Integer> l = new LinkedList<>();
 		System.out.println(l);
-
+		Object[] array = l.toArray();	
+		for (Object o : array) {
+			System.out.println(o);
+		}
+		System.out.println(array);
+		
 		System.out.println("\nadd(0,1): " + l.add(0, 1));
 		System.out.println(l);
 
@@ -242,7 +243,7 @@ public class LinkedList<E> implements Iterable<E> {
 		}
 		
 		System.out.println("\nusing toArray()");
-		Object[] array = l.toArray();		
+		array = l.toArray();		
 		for (Object i : array) {
 			System.out.println(i);
 		}

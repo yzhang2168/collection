@@ -66,25 +66,25 @@ public class BST<E extends Comparable<E>> implements Iterable<E> {
             return true;
         }
 
-        TreeNode<E> parent = null;
         TreeNode<E> curr = root;
         while (curr != null) {
             if (e.equals(curr.e)) {
                 return false;
             } else if (e.compareTo(curr.e) < 0) {
-                parent = curr;
-                curr = curr.left;
+                if (curr.left == null) {
+                	curr.left = newNode;
+                	break;
+                } else {
+                	curr = curr.left;
+                }
             } else {
-                parent = curr;
-                curr = curr.right;
+            	if (curr.right == null) {
+            		curr.right = newNode;
+            		break;
+            	} else {
+            		curr = curr.right;
+            	}
             }
-        }
-
-        // curr == null
-        if (e.compareTo(parent.e) < 0) {
-            parent.left = newNode;
-        } else {
-            parent.right = newNode;
         }
         size++;
         return true;
@@ -356,7 +356,7 @@ public class BST<E extends Comparable<E>> implements Iterable<E> {
 
     @Override
     public BST<E> clone() throws CloneNotSupportedException {
-        BST<E> clone = new BST<E>();
+    	BST<E> clone = new BST<E>();
         clone(clone, root);
         return clone;
     }
@@ -439,7 +439,7 @@ public class BST<E extends Comparable<E>> implements Iterable<E> {
     }
 
     public static void main(String[] args) {
-        BST<Integer> test = new BST<Integer>();
+    	BST<Integer> test = new BST<Integer>();
         test.insert(5);
         System.out.println("size:    " + test.size());
         System.out.println("inorder: " + test.inorder());
