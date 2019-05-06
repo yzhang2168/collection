@@ -42,10 +42,11 @@ public class StackWithLinkedList<E> {
 		if (head == null) {
 			return null;
 		} else {
-			E result = head.value;
+			Node prev = head;
 			head = head.next;
+			prev.next = null; // so that prev cannot be used elsewhere which would potentially cause bugs
 			size--;
-			return result;
+			return prev.value;
 		}
 	}
 
