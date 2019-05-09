@@ -44,13 +44,14 @@ public class QueueWithLinkedList<E> {
 		if (head == null) {
 			return null;
 		} else {
-			E result = head.value;
-			if (head == tail) {
-				tail = null;
-			} 
+			Node node = head;
 			head = head.next;
+			if (head == null) {
+				tail = null;
+			}
+			node.next = null; // disconnect prev head from rest so it cannot be reused 
 			size--;
-			return result;
+			return node.value;
 		}
 	}
 

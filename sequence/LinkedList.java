@@ -102,10 +102,6 @@ public class LinkedList<E> implements Iterable<E> {
 	}
 
 	public boolean contains(E value) {
-		if (isEmpty()) {
-			return false;
-		}
-
 		Node curr = head;
 		while (curr != null && !curr.value.equals(value)) {
 			curr = curr.next;
@@ -119,10 +115,11 @@ public class LinkedList<E> implements Iterable<E> {
 			throw new IndexOutOfBoundsException("Invalid index");
 		}
 
-		E result = null;
+		Node target = null;
 		if (index == 0) {
-			result = head.value;
+			target = head;
 			head = head.next;
+			target.next = null;
 		} else {
 			Node prev = head;
 			while (prev != null && prev.next != null && index > 1) {
@@ -130,19 +127,24 @@ public class LinkedList<E> implements Iterable<E> {
 				index--;
 			}
 			// index == 1, prev.next is target
-			result = prev.next.value;
+			target = prev.next;
 			prev.next = prev.next.next;
+			target.next = null;
 		}
 		size--;
-		return result;
+		return target.value;
 	}
 
 	/** removes first occurrence */
 	public boolean remove(E value) {
 		if (isEmpty()) {
 			return false;
-		} else if (head.value.equals(value)) {
+		} 
+
+		Node target = head;
+		if (head.value.equals(value)) {
 			head = head.next;
+			target.next = null;
 			size--;
 			return true;
 		} else {
@@ -152,7 +154,9 @@ public class LinkedList<E> implements Iterable<E> {
 			}
 			// prev.next == null || prev.next.value.equals(value)
 			if (prev.next != null) {
+				target = prev.next;
 				prev.next = prev.next.next;
+				target.next = null;
 				size--;
 				return true;
 			} else {
@@ -251,20 +255,21 @@ public class LinkedList<E> implements Iterable<E> {
 		System.out.print("\nremoving non-existing value: ");
 		//System.out.println(l.remove(10));
 
-		System.out.print("\nremoving head: ");
+		System.out.print("\nremoving index = 2: ");
 		System.out.println(l.remove(2));
 		System.out.println(l);
 
-		System.out.print("\nremoving head: ");
+		System.out.print("\nremoving index = 1: ");
 		System.out.println(l.remove(1));
 		System.out.println(l);
 
-		System.out.print("\nremoving head: ");
-		System.out.println(l.remove(new Integer(3)));
+		System.out.print("\nremoving index = 0: ");
+		System.out.println(l.remove(0));
 		System.out.println(l);
 
-		System.out.print("\nremoving from a list with head == null: ");
-		//System.out.println(l.remove(1));
+		//System.out.print("\nremoving from a list with head == null: ");
+		//System.out.println(l.remove(0));
+		l.add(100);
 		System.out.println(l);
 
 	}

@@ -11,8 +11,7 @@ public class ArrayListWithArray<E> implements Iterable<E> {
 	private int size;
 	
 	public ArrayListWithArray() {
-		array = (E[]) new Object[INIT_CAPACITY];
-		size = 0;
+		this(INIT_CAPACITY);
 	}
 	
 	public ArrayListWithArray(int capacity) {
@@ -150,7 +149,7 @@ public class ArrayListWithArray<E> implements Iterable<E> {
 
 		@Override
 		public E next() {
-			return get(curr++);
+			return array[curr++];
 		}
 		
 		@Override
@@ -186,6 +185,5 @@ public class ArrayListWithArray<E> implements Iterable<E> {
 		
 		l.remove(1);
 		System.out.println(l);
-	}
-	
+	}	
 }
