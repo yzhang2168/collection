@@ -7,12 +7,13 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Queue;
 
-class TreeNode<E extends Comparable<E>> {
-    protected E e;
-    protected TreeNode<E> left;
-    protected TreeNode<E> right;
+// E here is different from BST<E>
+class TreeNode<Ei extends Comparable<Ei>> {
+    protected Ei e;
+    protected TreeNode<Ei> left;
+    protected TreeNode<Ei> right;
 
-    protected TreeNode(E e) {
+    protected TreeNode(Ei e) {
         this.e = e;
         left = null;
         right = null;
@@ -192,7 +193,23 @@ public class BST<E extends Comparable<E>> implements Iterable<E> {
 
     public List<E> preorder() {
         List<E> result = new ArrayList<E>();
-        preorderRecursion(root, result);
+        //preorderRecursion(root, result);
+        if (root == null) {
+        	return result;
+        }
+        
+        Deque<TreeNode<E>> stack = new ArrayDeque<>();
+        stack.offer(root);
+        while (!stack.isEmpty()) {
+        	TreeNode<E> curr = stack.pollFirst();
+        	result.add(curr.e);
+        	if (curr.right != null) {
+        		stack.offerFirst(curr.right);
+        	}
+        	if (curr.left != null) {
+        		stack.offerFirst(curr.left);
+        	}
+        }
         return result;
     }
 
@@ -207,7 +224,43 @@ public class BST<E extends Comparable<E>> implements Iterable<E> {
 
     public List<E> postorder() {
         List<E> result = new ArrayList<E>();
-        postorderRecursion(root, result);
+        //postorderRecursion(root, result);
+        if (root == null) {
+        	return result;
+        }
+        
+        Deque<TreeNode<E>> stack = new ArrayDeque<TreeNode<E>>();
+        TreeNode<E> prev = null;
+        stack.offerFirst(root);
+        
+        while (!stack.isEmpty()) {
+        	TreeNode<E> curr = stack.peekFirst();
+        	
+        	// top to down
+        	if (prev == null || curr == prev.left || curr == prev.right) {
+        		if (curr.left != null) {
+        			stack.offerFirst(curr.left);
+        		} else if (curr.right != null) {
+        			stack.offerFirst(curr.right);
+        		} else {
+        			result.add(curr.e);
+        			stack.pollFirst();
+        		}
+        	} else if (prev == curr.left) { // back from left subtree 
+        		if (curr.right != null) {
+        			stack.offerFirst(curr.right);
+        		} else {
+        			result.add(curr.e);
+        			stack.pollFirst();
+        		}
+        	} else { // back from right subtree
+        		result.add(curr.e);
+        		stack.pollFirst();
+        	}
+        	
+        	prev = curr;
+        }
+        
         return result;
     }
 
