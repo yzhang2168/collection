@@ -7,6 +7,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Queue;
 
+
 // E here is different from BST<E>
 class TreeNode<Ei extends Comparable<Ei>> {
     protected Ei e;
@@ -47,46 +48,45 @@ public class BST<E extends Comparable<E>> implements Iterable<E> {
 
     public boolean search(E e) {
         TreeNode<E> curr = root;
-        while (curr != null) {
-            if (curr.e.equals(e)) {
-                return true;
-            } else if (curr.e.compareTo(e) < 0) {
+        while (curr != null && !curr.e.equals(e)) {
+            if (curr.e.compareTo(e) < 0) {
                 curr = curr.right;
-            } else {
+            } else if (curr.e.compareTo(e) > 0) {
                 curr = curr.left;
             }
         }
-        return false;
+        
+        // curr == null || curr.e.equals(e)
+        return curr != null;
     }
 
     public boolean insert(E e) {
         TreeNode<E> newNode = new TreeNode<E>(e);
         if (root == null) {
             root = newNode;
-            size++;
-            return true;
-        }
-
-        TreeNode<E> curr = root;
-        while (curr != null) {
-            if (e.equals(curr.e)) {
-                return false;
-            } else if (e.compareTo(curr.e) < 0) {
-                if (curr.left == null) {
-                	curr.left = newNode;
-                	break;
+        } else {
+            TreeNode<E> curr = root;
+            while (curr != null) {
+                if (e.equals(curr.e)) {
+                    return false;
+                } else if (e.compareTo(curr.e) < 0) {
+                    if (curr.left == null) {
+                    	curr.left = newNode;
+                    	break;
+                    } else {
+                    	curr = curr.left;
+                    }
                 } else {
-                	curr = curr.left;
+                	if (curr.right == null) {
+                		curr.right = newNode;
+                		break;
+                	} else {
+                		curr = curr.right;
+                	}
                 }
-            } else {
-            	if (curr.right == null) {
-            		curr.right = newNode;
-            		break;
-            	} else {
-            		curr = curr.right;
-            	}
             }
         }
+
         size++;
         return true;
     }
@@ -155,6 +155,48 @@ public class BST<E extends Comparable<E>> implements Iterable<E> {
         return true;
     }
 
+    public TreeNode<E> delete(TreeNode<E> root, E e) {
+		if (root == null) {
+			return null; 
+		}
+		
+		if (e.compareTo(root.e) < 0) {
+			root.left = delete(root.left, e);
+			return root;
+		} else if (e.compareTo(root.e) > 0) {
+			root.right = delete(root.right, e);
+			return root;
+		} 
+		
+		// root is target
+		if (root.left == null) {
+			return root.right;
+		} else if (root.right == null) {
+			return root.left;
+		} else if (root.right.left == null) {
+			root.right.left = root.left;
+			return root.right;
+		} else {
+			TreeNode<E> smallest = deleteSmallest(root.right);
+			smallest.left = root.left;
+			smallest.right = root.right;
+			return smallest;
+		}
+	}
+	
+	private TreeNode<E> deleteSmallest(TreeNode<E> node) {
+		TreeNode<E> prev = node;
+		TreeNode<E> curr = node.left;
+		while (curr.left != null) {
+			prev = curr;
+			curr = curr.left;
+		}
+		// curr.left == null
+		prev.left = curr.right;
+		return curr;
+		
+	}
+	
     public List<E> inorderRecursive() {
         List<E> result = new ArrayList<E>();
         inorderRecursion(root, result);
@@ -170,6 +212,27 @@ public class BST<E extends Comparable<E>> implements Iterable<E> {
         inorderRecursion(curr.right, result);
     }
 
+    public List<E> inorder1() {
+        List<E> result = new ArrayList<E>();
+        Deque<TreeNode<E>> stack = new ArrayDeque<TreeNode<E>>();
+        TreeNode<E> curr = null;
+
+        while (curr != null || !stack.isEmpty()) {
+            // try to go left before curr node is printed
+        	if (curr != null) {
+            	stack.offerFirst(curr);
+            	curr = curr.left;
+            } else {
+            	// when left is null, left subtree has been traversed, the next to traverse is the top node in stack
+            	curr = stack.pollFirst();
+            	result.add(curr.e);
+            	curr = curr.right;
+            }
+        }
+
+        return result;
+    }
+    
     public List<E> inorder() {
         List<E> result = new ArrayList<E>();
         Deque<TreeNode<E>> stack = new ArrayDeque<TreeNode<E>>();
@@ -222,6 +285,8 @@ public class BST<E extends Comparable<E>> implements Iterable<E> {
         preorderRecursion(curr.right, result);
     }
 
+    /** mimics the call stack
+     * can be used a template for all traversals */
     public List<E> postorder() {
         List<E> result = new ArrayList<E>();
         //postorderRecursion(root, result);
@@ -238,11 +303,13 @@ public class BST<E extends Comparable<E>> implements Iterable<E> {
         	
         	// top to down
         	if (prev == null || curr == prev.left || curr == prev.right) {
+        		// try to go left first
         		if (curr.left != null) {
         			stack.offerFirst(curr.left);
         		} else if (curr.right != null) {
         			stack.offerFirst(curr.right);
         		} else {
+        			// if we cannot go either left or right, curr is leaf
         			result.add(curr.e);
         			stack.pollFirst();
         		}
@@ -295,10 +362,34 @@ public class BST<E extends Comparable<E>> implements Iterable<E> {
                     queue.offer(curr.right);
                 }
             }
-            result.add(new ArrayList<E>(level));
+            result.add(level);
         }
 
         return result;
+    }
+    
+    public List<E> getRange(E lower, E upper) {
+    	List<E> result = new ArrayList<E>();
+    	getRange(root, lower, upper, result);
+    	return result;
+    }
+    
+    private void getRange(TreeNode<E> root, E lower, E upper, List<E> result) {
+    	if (root == null) {
+    		return;
+    	}
+    	
+    	if (lower.compareTo(root.e) < 0) {
+    		getRange(root.left, lower, upper, result);
+    	}
+    	
+    	if (lower.compareTo(root.e) <= 0 && upper.compareTo(root.e) >= 0) {
+    		result.add(root.e);
+    	}
+    	
+    	if (upper.compareTo(root.e) > 0) {
+    		getRange(root.right, lower, upper, result);
+    	}
     }
 
     public List<E> pathFromRoot(E e) {
@@ -336,6 +427,39 @@ public class BST<E extends Comparable<E>> implements Iterable<E> {
     }
 
     public boolean isCompleteBST() {
+    	if (root == null) {
+            return true;
+        }
+        
+    	Queue<TreeNode<E>> queue = new ArrayDeque<TreeNode<E>>();
+    	boolean seenNull = false;
+        queue.offer(root);        
+        while (!queue.isEmpty()) {
+        	TreeNode<E> curr = queue.poll();
+        	if (curr.left == null) {
+        		if (seenNull) {
+        			return false;
+        		} else {
+        			seenNull = true;
+        		}
+        	} else {
+        		queue.offer(curr.left);
+        	}
+
+			if (curr.right == null) {
+        		if (seenNull) {
+        			return false;
+        		} else {
+        			seenNull = true;
+        		}
+        	} else {
+        		queue.offer(curr.right);
+        	}
+        }
+        return true;
+     }
+
+    public boolean isCompleteBST0() {
         return size == Math.pow(2, height()) - 1;
     }
 

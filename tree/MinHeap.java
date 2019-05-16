@@ -9,17 +9,12 @@ public class MinHeap<E extends Comparable<E>> {
 	private int size;
 	private static final int INIT_CAPACITY = 10;
 	private static final double SCALING_FACTOR = 1.5;
-	private Comparator comparator;
+	private Comparator<E> comparator;
 
 	public MinHeap() {
 		array = new Object[INIT_CAPACITY];
 		size = 0;
-	}
-
-	public MinHeap(Comparator<E> comparator) {
-		array = new Object[INIT_CAPACITY];
-		size = 0;
-		this.comparator = comparator;
+		this.comparator = null;
 	}
 
 	public MinHeap(int cap) {
@@ -29,6 +24,13 @@ public class MinHeap<E extends Comparable<E>> {
 
 		array = new Object[cap];
 		size = 0;
+		this.comparator = null;
+	}
+
+	public MinHeap(Comparator<E> comparator) {
+		array = new Object[INIT_CAPACITY];
+		size = 0;
+		this.comparator = comparator;
 	}
 
 	public MinHeap(Collection<? extends E> c) {
@@ -37,12 +39,14 @@ public class MinHeap<E extends Comparable<E>> {
 		}
 		array = c.toArray();
 		size = array.length;
+		this.comparator = null;
 		heapify(); // the only place heapify() is called
 	}
 
 	/** heapify the heapArray */
 	private void heapify() {
-		for (int i = size / 2 - 1; i >= 0; i--) {
+		int parentLastNode = parentIndex(size - 1);
+		for (int i = parentLastNode; i >= 0; i--) {
 			percolateDown(i);
 		}
 	}
@@ -50,7 +54,7 @@ public class MinHeap<E extends Comparable<E>> {
 	private void percolateUp(int index) {
 		while (index > 0) {
 			int parentIndex = parentIndex(index);
-			if (comparator != null && comparator.compare(array[parentIndex], array[index]) <= 0
+			if (comparator != null && comparator.compare((E) array[parentIndex], (E) array[index]) <= 0
 					|| comparator == null && ((E) array[parentIndex]).compareTo((E) array[index]) <= 0) {
 				break;
 			} else {
@@ -72,14 +76,14 @@ public class MinHeap<E extends Comparable<E>> {
 			// update swapCandiate if right child exists (in range) and < left child
 			if (rightChildIndex <= size - 1) {
 				if (comparator == null && ((E) array[leftChildIndex]).compareTo((E) array[rightChildIndex]) >= 0 ||
-						comparator != null && comparator.compare(array[leftChildIndex], array[rightChildIndex]) >= 0) {
+						comparator != null && comparator.compare((E) array[leftChildIndex], (E) array[rightChildIndex]) >= 0) {
 				    swapCandidate = rightChildIndex;
 				}
 			}
 
 			// if curr is larger, swap
 			if (comparator == null && ((E) array[index]).compareTo((E) array[swapCandidate]) > 0 ||
-					comparator != null && comparator.compare(array[index], array[swapCandidate]) > 0) {
+					comparator != null && comparator.compare((E) array[index], (E) array[swapCandidate]) > 0) {
 				swap(array, index, swapCandidate);
 				index = swapCandidate;
 			} else {
