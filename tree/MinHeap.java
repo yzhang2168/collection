@@ -115,9 +115,9 @@ public class MinHeap<E extends Comparable<E>> {
 				array[0] = null;
 			} else {
 				array[0] = array[size - 1];
+				size--;
 				percolateDown(0);
-			}
-			size--;
+			}			
 			return result;
 		}
 	}
@@ -127,7 +127,8 @@ public class MinHeap<E extends Comparable<E>> {
 			expand();
 		}
 		array[size] = value;
-		percolateUp(size++);
+		size++;
+		percolateUp(size - 1);
 	}
 
 	private void expand() {
